@@ -1,0 +1,6 @@
+An "Acrobot" IRC bot written entirely in Python in order to play the
+IRC game "Acrophobia". I wrote the code over the course of a few lazy
+afternoons in 2005. Despite (or probably because of) the fact that it
+works, I've never gotten round to cleaning up the somewhat messy code.
+
+Released under the GPL.
