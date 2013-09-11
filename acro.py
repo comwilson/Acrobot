@@ -28,7 +28,7 @@ false = 0
 version = "0.6.1b"
 
 # CONFIGURATION STUFF GOES HERE
-acro_time = 90 # Seconds to come up with an acro
+acro_time = 132 # Seconds to come up with an acro
 vote_time = 45 # Seconds to vote on acros
 start_acro= 3  # The number of letters in the first round
 rounds    = 5  # Number of rounds (letters in acro goes up once each round
@@ -43,11 +43,11 @@ alphabet = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N'
 	   #  an array, and it looked like a good place to put it.
 allow_doubles	= true 	# Allow the same letter twice in a row
 allow_triples	= false # Allow the same letter three times in a row
-servers		= [["lancre.lagnet.org.za", 6667, "b4nb0t"], ["dragon.lagnet.org.za", 6667]]
-nick		= "Jester"
-chan		= "#games"
-chanowner	= "nooner"
-botmaster	= "Cenobite"
+servers		= [["irc.synirc.net", 6667, "spoonbot"]]
+nick		= "spoonbot"
+chan		= "#just_post"
+chanowner	= "andreaPlanbee"
+botmaster	= "spoonbrunch"
 
 # Colours and formatting. TODO: finish this and implement it!
 bold		= "\x02"
@@ -67,7 +67,7 @@ help_main05	= "For more information, please ask " + chanowner + ", " + botmaster
 
 class AcroBot(ircbot.SingleServerIRCBot):
 	def __init__(self, serverlist, nick, chan):
-		print "AcroBot online!"
+		print('AcroBot online!')
 		self.me = nick
 		self.chan = chan
 		
@@ -85,14 +85,16 @@ class AcroBot(ircbot.SingleServerIRCBot):
 		self.acro = ""
 		self.mode = ""
 		
+		self.started = false
+		
 		ircbot.SingleServerIRCBot.__init__(self, serverlist, nick, "AcroBot")
-		print "Connecting..."
+		print("Connecting...")
 		
 		self.start()
 		
 	def disconnect(self):
 		ircbot.SingleServerIRCBot.disconnect(self, "YAAB: Yet Another AcroBot-" + version + " by Cenobite")
-		print "Disconnecting..."
+		print("Disconnecting...")
 		sys.exit()
 		
 	def round(self):
@@ -124,7 +126,7 @@ class AcroBot(ircbot.SingleServerIRCBot):
 		self.which_round += 1
 		self.gen_acro(start_acro + self.which_round - 1)
 		self.mode = "ACRO"
-		self.connection.privmsg(self.chan, "\x0304\x1FRound " + str(self.which_round) + "!\x0F \x0304The new acro is: \x02\x0303" + self.acro)
+		self.connection.privmsg(self.chan, "\x0304\x1FRound " + str(self.which_round) + "!\x0F \x0304The new acro is: \x02\x0303" + self.acro + "\x0F \x0304 you have " + str(acro_time)+" seconds")
 		threading.Timer(acro_time, self.switch_mode).start()
 		
 	def switch_mode(self):
@@ -137,19 +139,22 @@ class AcroBot(ircbot.SingleServerIRCBot):
 	def startgame(self):
 		# The following (hopefully) fixes a bug that carries
 		# acros and scores across games
-		self.scores = {}
-		self.this_round_nicks = []
-		self.this_round_acros = []
-		self.voted = []
-		self.this_round_scores = []
+		
+		if self.started == false:
+			self.scores = {}
+			self.this_round_nicks = []
+			self.this_round_acros = []
+			self.voted = []
+			self.this_round_scores = []
 
-		self.which_round = 1
-		self.on = true
-		self.gen_acro(start_acro)
-		self.mode = "ACRO"
-		self.connection.privmsg(self.chan, "\x02\x0304Starting a new game of acro! Get ready!")
-		self.connection.privmsg(self.chan, "\x0304\x1FRound " + str(self.which_round) + "!\x0F \x0304The new acro is: \x02\x0303" + self.acro)
-		threading.Timer(acro_time, self.switch_mode).start()
+			self.which_round = 1
+			self.on = true
+			self.gen_acro(start_acro)
+			self.mode = "ACRO"
+			self.connection.privmsg(self.chan, "\x02\x0304Starting a new game of acro! Get ready!")
+			self.connection.privmsg(self.chan, "\x0304\x1FRound " + str(self.which_round) + "!\x0F \x0304The new acro is: \x02\x0303" + self.acro+ "\x0F \x0304 you have " + str(acro_time)+" seconds")
+			self.started = true
+			threading.Timer(acro_time, self.switch_mode).start()
 	
 	def endgame(self):
 		msg = self.connection.privmsg
@@ -157,10 +162,11 @@ class AcroBot(ircbot.SingleServerIRCBot):
 		msg(self.chan, "\x02\x0304Ending scores:")
 		for nick in self.scores.keys():
 			msg(self.chan, "\x0313\x1F" + nick + "\x0F\x02\x0312 with a score of \x0F\x1F\x0313" + str(self.scores[nick]) + "\x0F\x02\x0312!")
-			
+		self.started = false 
+		
 	def on_welcome(self, c, e):
 		c.join(self.chan)
-		c.privmsg(self.chan, "Hello! Try '/msg " + nick + " !help' for more info. Have fun! :) ")
+		c.privmsg(self.chan, "Hello! Try '/msg " + nick + " !help' wow so help. Praise BRD! :) ")
 		
 	def on_privmsg(self, c, e):
 		if string.split(e.arguments()[0])[0] == "!help":
@@ -176,7 +182,7 @@ class AcroBot(ircbot.SingleServerIRCBot):
 			c.privmsg(self.chan, "Restarting...")
 			self.start()
 		elif string.split(e.arguments()[0])[0] == "!shutdown":
-			c.privmsg(self.chan, "Have fun, bye!")
+			c.privmsg(self.chan, "Will I dream?")
 			self.disconnect()
 		elif self.on == false:
 			c.privmsg(e.source(), "Sorry, no game is currently running. Try '!help'.")
