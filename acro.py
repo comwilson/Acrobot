@@ -43,8 +43,8 @@ alphabet = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N'
 	   #  an array, and it looked like a good place to put it.
 allow_doubles	= true 	# Allow the same letter twice in a row
 allow_triples	= false # Allow the same letter three times in a row
-servers		= [["irc.synirc.net", 6667, "spoonbot"]]
-nick		= "spoonbot"
+servers		= [["irc.synirc.net", 6667, "spoonbutt"]]
+nick		= "spoonbutt"
 chan		= "#just_post"
 chanowner	= "andreaPlanbee"
 botmaster	= "spoonbrunch"
@@ -206,9 +206,9 @@ class AcroBot(ircbot.SingleServerIRCBot):
 		elif self.mode == "VOTE":
 			try:
 				vote = int(string.split(e.arguments()[0])[0])
-				if irclib.nm_to_n(e.source()) not in self.this_round_nicks:
-					c.notice(irclib.nm_to_n(e.source()), "You can't vote if you don't participate.")
-					return
+				#if irclib.nm_to_n(e.source()) not in self.this_round_nicks:
+				#	c.notice(irclib.nm_to_n(e.source()), "You can't vote if you don't participate.")
+				#	return
 				if irclib.nm_to_n(e.source()) == self.this_round_nicks[vote]:
 					c.notice(irclib.nm_to_n(e.source()), "You can't vote for yourself. Try again.")
 					return
@@ -255,7 +255,11 @@ class AcroBot(ircbot.SingleServerIRCBot):
 			else:
 				n -= weight[l]
 		return alphabet[-1]
-
+		
+	def on_pubmsg(self, c, e):
+		if "ily" in e.arguments():
+			c.privmsg(self.chan, "ily 2 <3")
+			
 AcroBot(servers, nick, chan)
 
 # TODO
