@@ -160,7 +160,6 @@ class AcroBot(ircbot.SingleServerIRCBot):
 	
 	def stopgame(self):
 		#do stuff
-		self.connection.privmsg(self.chan, "\x02\x0304Stopping game... D:")
 		self.game_timer.cancel()
 		self.started = false
 		self.on = false
@@ -192,6 +191,7 @@ class AcroBot(ircbot.SingleServerIRCBot):
 			else:
 				c.notice(irclib.nm_to_n(e.source()), "You are not authorised to start a game :(")
 		elif string.split(e.arguments()[0])[0] == "!stop":
+			c.privmsg(self.chan, "Stopping game... D:")
 			self.stopgame()
 		elif string.split(e.arguments()[0])[0] == "!rehash":
 			c.privmsg(self.chan, "Restarting...")
