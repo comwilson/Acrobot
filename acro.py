@@ -48,7 +48,7 @@ nick		= "spoonbutt"
 chan		= "#just_post"
 chanowner	= "andreaPlanbee"
 botmaster	= "spoonbrunch"
-authorised_starters	= ['blueduch', 'lif', 'friendzoneartist', 'mmultiplier']
+authorised_starters	= ['lif', 'friendzoneartist', 'mmultiplier']
 
 # Colours and formatting. TODO: finish this and implement it!
 bold		= "\x02"
@@ -192,7 +192,10 @@ class AcroBot(ircbot.SingleServerIRCBot):
 			else:
 				c.notice(irclib.nm_to_n(e.source()), "You are not authorised to start a game :(")
 		elif string.split(e.arguments()[0])[0] == "!stop":
-			self.stopgame()
+			if irclib.nm_to_n(e.source()) == botmaster or irclib.nm_to_n(e.source()) == chanowner:
+				self.stopgame()
+			else:
+				c.notice(irclib.nm_to_n(e.source()), "I can't let you do that, " + irclib.nm_to_n(e.source()))
 		elif string.split(e.arguments()[0])[0] == "!rehash":
 			c.privmsg(self.chan, "Restarting...")
 			self.start()
